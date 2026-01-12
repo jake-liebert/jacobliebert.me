@@ -48,7 +48,7 @@ const observer = new IntersectionObserver((entries) => {
 // Apply fade-in animation to sections and cards
 document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll(
-        '.timeline-item, .education-card, .skill-card, .highlight-card, .about-text, .contact-link, .win-card, .institution-item, .future-content'
+        '.timeline-item, .education-card, .skill-card, .highlight-card, .about-text, .contact-link, .win-card, .future-content'
     );
 
     animatedElements.forEach((el, index) => {
