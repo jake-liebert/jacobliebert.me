@@ -321,7 +321,11 @@ img {
 
 .stat-card {
     text-align: center;
-    padding: 24px;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .stat-number {
@@ -338,11 +342,12 @@ img {
 }
 
 .stat-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--color-text-muted);
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
 }
 
 @media (max-width: 768px) {
@@ -452,6 +457,70 @@ img {
     font-weight: 500;
 }
 
+/* ===== Wins Section ===== */
+.wins {
+    background: var(--color-bg);
+}
+
+.wins-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.win-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 32px;
+    transition: var(--transition-medium);
+}
+
+.win-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.win-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.win-header h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+}
+
+.win-impact {
+    font-size: 0.9rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.win-content p {
+    margin-bottom: 16px;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+}
+
+.win-content p:last-child {
+    margin-bottom: 0;
+}
+
+.win-content strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
 /* ===== Experience Section ===== */
 .timeline {
     position: relative;
@@ -529,6 +598,15 @@ img {
     color: var(--color-text-muted);
     font-weight: 500;
     margin-bottom: 16px;
+}
+
+.timeline-context {
+    font-size: 0.95rem;
+    color: var(--color-primary);
+    font-style: italic;
+    margin-bottom: 16px;
+    padding-left: 20px;
+    border-left: 3px solid var(--color-primary);
 }
 
 .timeline-content ul {
@@ -652,6 +730,106 @@ img {
     line-height: 1.6;
 }
 
+/* ===== Institutions Section ===== */
+.institutions {
+    background: var(--color-bg);
+    text-align: center;
+}
+
+.institutions-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 40px;
+    align-items: center;
+}
+
+.institution-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.institution-logo {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    transition: var(--transition-fast);
+}
+
+.institution-item:hover .institution-logo {
+    color: var(--color-primary-hover);
+    transform: scale(1.1);
+}
+
+.institution-logo svg {
+    width: 100%;
+    height: 100%;
+}
+
+.institution-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-align: center;
+}
+
+.institution-detail {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .institutions-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+    }
+}
+
+@media (max-width: 600px) {
+    .institutions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    .institution-logo {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* ===== Future Section ===== */
+.future {
+    background: var(--color-bg-alt);
+}
+
+.future-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.future-content p {
+    margin-bottom: 24px;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.future-content p:last-child {
+    margin-bottom: 0;
+}
+
+.future-lead {
+    font-size: 1.25rem;
+    color: var(--color-text);
+    font-weight: 500;
+    line-height: 1.6;
+}
+
 /* ===== Contact Section ===== */
 .contact {
     background: var(--color-bg-alt);
@@ -754,6 +932,15 @@ img {
     .skills-grid {
         grid-template-columns: 1fr;
     }
+
+    .win-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .win-header h3 {
+        font-size: 1.3rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -805,6 +992,18 @@ img {
 
     .about-highlights {
         flex-direction: column;
+    }
+
+    .win-card {
+        padding: 24px;
+    }
+
+    .win-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .win-content p {
+        font-size: 0.95rem;
     }
 }
 
