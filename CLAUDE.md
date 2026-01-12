@@ -74,12 +74,32 @@ The site uses a dark theme with premium gold/copper accents:
 12. **Footer**
 
 ### JavaScript Features (script.js)
-- Smooth scrolling for anchor links
-- Navbar background change on scroll
-- Intersection Observer for fade-in animations on sections/cards
-- Active nav link highlighting based on scroll position
-- Typing effect for hero title
-- Subtle parallax effect on hero background
+
+**Premium Animation Library**: GSAP 3.12.5 + ScrollTrigger (loaded via CDN)
+
+**Core Features**:
+- **Orchestrated hero entrance** - Cascading reveal: photo → greeting → name → title → CTAs
+- **Animated stat counters** - Numbers count up when stats section enters viewport ($600M, 4→10, etc.)
+- **Cursor glow effect** - Subtle gold gradient follows cursor (desktop only, disabled on touch devices)
+- **Scroll progress indicator** - Gold line at top tracks scroll position
+- **3D card tilt effects** - Cards respond to mouse position with perspective tilt (via vanilla-tilt.js)
+- **Gradient border animations** - Animated gradient borders on card hover
+- **Blur-to-focus reveals** - Section titles blur into focus as they enter viewport
+- **Timeline draw-on animation** - Experience timeline line draws itself on scroll
+- **Card fade-in animations** - Individual cards animate in when visible
+- **Mobile hamburger menu** - Slide-in navigation panel with staggered link reveals
+- **Hero floating shapes** - Decorative shapes with scroll-linked parallax
+- **Active nav link highlighting** - Highlights current section in navigation
+
+**External Libraries** (CDN):
+- GSAP 3.12.5 (`gsap.min.js`)
+- GSAP ScrollTrigger (`ScrollTrigger.min.js`)
+- vanilla-tilt.js 1.8.1 (`vanilla-tilt.min.js`)
+
+**Accessibility Features**:
+- `prefers-reduced-motion` support - disables animations for users who prefer reduced motion
+- Graceful degradation - site works without JavaScript (`.no-js` class fallback)
+- Touch device detection - cursor glow and tilt effects disabled on mobile
 
 ## Content Strategy & Positioning
 
@@ -162,8 +182,60 @@ With CSS:
 }
 ```
 
-### Adding Fade-in Animation
-Add the element selector to the `animatedElements` query in script.js:49-52.
+### Adding New GSAP Animations
+
+**CRITICAL: Use `gsap.fromTo()` not `gsap.from()`**
+- Explicitly sets both start state (hidden) and end state (visible)
+- More reliable - prevents elements getting stuck in hidden states
+
+**Pattern for scroll-triggered animations:**
+```javascript
+gsap.fromTo('.element',
+    {
+        // Start state (hidden)
+        opacity: 0,
+        y: 40
+    },
+    {
+        // End state (visible)
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+            trigger: '.element',
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            once: true
+        }
+    }
+);
+```
+
+**Avoid staggered animations on cards** - They can cause progressive fade issues where first card is fully visible, second partially visible, third more faded. Instead, use individual triggers per card.
+
+**Common ScrollTrigger settings:**
+- `start: 'top 90%'` - Animation starts when element is 90% down viewport
+- `toggleActions: 'play none none none'` - Only play forward, no reverse
+- `once: true` - Animation fires only once
+- `scrub: 1` - For scroll-linked animations (like parallax)
+
+## Animation Performance
+
+**GPU-Accelerated Properties** (use these):
+- `transform` (translateX, translateY, scale, rotate)
+- `opacity`
+- `filter` (sparingly)
+
+**Avoid Animating** (causes layout reflow):
+- `width`, `height`
+- `top`, `left`, `right`, `bottom`
+- `margin`, `padding`
+
+**Mobile Optimization**:
+- Hero shapes have reduced opacity and less blur on mobile
+- Cursor glow and 3D tilt disabled on touch devices
+- Staggered animations avoided to reduce complexity
 
 ## GitHub Pages Deployment
 
