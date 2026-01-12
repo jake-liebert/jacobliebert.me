@@ -457,9 +457,62 @@ img {
     font-weight: 500;
 }
 
+/* ===== Scale Section ===== */
+.scale {
+    background: var(--color-bg);
+}
+
+.scale-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.scale-lead {
+    font-size: 1.25rem;
+    color: var(--color-text);
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.scale-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.scale-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 32px;
+    transition: var(--transition-medium);
+}
+
+.scale-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-4px);
+}
+
+.scale-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+    color: var(--color-text);
+}
+
+.scale-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
 /* ===== Wins Section ===== */
 .wins {
-    background: var(--color-bg);
+    background: var(--color-bg-alt);
 }
 
 .wins-grid {
@@ -851,6 +904,10 @@ img {
     .highlight-card {
         flex: 1;
         min-width: 200px;
+    }
+
+    .scale-grid {
+        grid-template-columns: 1fr;
     }
 
     .education-grid {
