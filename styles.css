@@ -13,6 +13,7 @@
     --color-copper: #b87333;
     --color-navy-light: #1e3a5f;
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
     --transition-fast: 0.2s ease;
     --transition-medium: 0.3s ease;
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -67,11 +68,13 @@ img {
 }
 
 .section-title {
+    font-family: var(--font-heading);
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 60px;
     position: relative;
     display: inline-block;
+    letter-spacing: -0.02em;
 }
 
 .section-title::after {
@@ -109,8 +112,10 @@ img {
 }
 
 .nav-logo {
+    font-family: var(--font-heading);
     font-size: 1.5rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -203,10 +208,12 @@ img {
 }
 
 .hero-name {
+    font-family: var(--font-heading);
     font-size: clamp(3rem, 8vw, 5rem);
-    font-weight: 700;
-    line-height: 1.1;
+    font-weight: 800;
+    line-height: 1.05;
     margin-bottom: 24px;
+    letter-spacing: -0.03em;
     background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -319,8 +326,10 @@ img {
 
 .stat-number {
     display: block;
+    font-family: var(--font-heading);
     font-size: 2.5rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--color-gold), var(--color-copper));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -415,8 +424,10 @@ img {
 }
 
 .highlight-title {
+    font-family: var(--font-heading);
     font-size: 1.1rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
     color: var(--color-text);
 }
 
@@ -506,8 +517,10 @@ img {
 }
 
 .timeline-content h3 {
+    font-family: var(--font-heading);
     font-size: 1.35rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
     margin-bottom: 4px;
 }
 
@@ -568,8 +581,10 @@ img {
 }
 
 .education-card h3 {
+    font-family: var(--font-heading);
     font-size: 1.2rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
     margin-bottom: 12px;
 }
 
@@ -624,8 +639,10 @@ img {
 }
 
 .skill-card h3 {
+    font-family: var(--font-heading);
     font-size: 1.2rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
     margin-bottom: 12px;
 }
 
@@ -688,6 +705,17 @@ img {
     border-top: 1px solid var(--color-border);
     color: var(--color-text-muted);
     font-size: 0.9rem;
+}
+
+.footer-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.footer-link:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
 }
 
 /* ===== Animations ===== */
