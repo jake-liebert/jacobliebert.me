@@ -1,53 +1,44 @@
 // ========================================
-// Premium Website Animations with GSAP
+// jacobliebert.me — minimal animation layer
 // ========================================
 
-// Remove no-js class for graceful degradation
 document.documentElement.classList.remove('no-js');
 
-// Register GSAP ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
-// Check for reduced motion preference
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ========================================
-// Hero Entrance Animation (Orchestrated)
+// Hero Entrance
 // ========================================
 
 if (!prefersReducedMotion) {
-    // Set initial hidden states for hero elements only
-    gsap.set('.hero-image, .hero-greeting, .hero-name, .hero-title, .hero-subtitle, .hero-cta, .hero-scroll', {
+    gsap.set('.hero-image, .hero-name, .hero-thesis, .hero-credentials, .hero-cta', {
         opacity: 0,
-        y: 20
+        y: 16
     });
 
-    // Create entrance timeline
-    const heroTl = gsap.timeline({ delay: 0.3 });
-
+    const heroTl = gsap.timeline({ delay: 0.2 });
     heroTl
-        .to('.hero-image', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' })
-        .to('.hero-greeting', { opacity: 1, y: 0, duration: 0.6 }, '-=0.4')
-        .to('.hero-name', { opacity: 1, y: 0, duration: 0.6 }, '-=0.3')
-        .to('.hero-title', { opacity: 1, y: 0, duration: 0.6 }, '-=0.3')
-        .to('.hero-subtitle', { opacity: 1, y: 0, duration: 0.6 }, '-=0.3')
-        .to('.hero-cta', { opacity: 1, y: 0, duration: 0.6 }, '-=0.3')
-        .to('.hero-scroll', { opacity: 1, y: 0, duration: 0.8 }, '-=0.2');
+        .to('.hero-image',       { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' })
+        .to('.hero-name',        { opacity: 1, y: 0, duration: 0.7 }, '-=0.4')
+        .to('.hero-thesis',      { opacity: 1, y: 0, duration: 0.7 }, '-=0.4')
+        .to('.hero-credentials', { opacity: 1, y: 0, duration: 0.6 }, '-=0.4')
+        .to('.hero-cta',         { opacity: 1, y: 0, duration: 0.6 }, '-=0.4');
 }
 
 // ========================================
-// Smooth Scroll for Navigation Links
+// Smooth Scroll for Anchor Links
 // ========================================
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        const target = document.querySelector(href);
         if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     });
 });
@@ -60,18 +51,17 @@ const navbar = document.querySelector('.navbar');
 
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
-
-    if (currentScroll > 100) {
-        navbar.style.background = 'rgba(10, 10, 15, 0.95)';
-        navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+    if (currentScroll > 60) {
+        navbar.style.background = 'rgba(10, 22, 40, 0.95)';
+        navbar.style.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.35)';
     } else {
-        navbar.style.background = 'rgba(10, 10, 15, 0.9)';
+        navbar.style.background = 'rgba(10, 22, 40, 0.85)';
         navbar.style.boxShadow = 'none';
     }
 });
 
 // ========================================
-// Scroll Progress Indicator
+// Scroll Progress Bar
 // ========================================
 
 gsap.to('.scroll-progress', {
@@ -86,13 +76,13 @@ gsap.to('.scroll-progress', {
 });
 
 // ========================================
-// Animated Stat Counters
+// Stat Counters
 // ========================================
 
 function animateCounter(element, target, prefix = '', suffix = '') {
     gsap.to({ val: 0 }, {
         val: target,
-        duration: 2,
+        duration: 1.8,
         ease: 'power2.out',
         onUpdate: function() {
             element.textContent = prefix + Math.floor(this.targets()[0].val) + suffix;
@@ -104,7 +94,7 @@ function animateArrowCounter(element) {
     const tl = gsap.timeline();
     tl.to({ val: 0 }, {
         val: 4,
-        duration: 0.8,
+        duration: 0.7,
         ease: 'power2.out',
         onUpdate: function() {
             element.textContent = Math.floor(this.targets()[0].val) + '→10';
@@ -112,7 +102,7 @@ function animateArrowCounter(element) {
     })
     .to({ val: 4 }, {
         val: 10,
-        duration: 1.2,
+        duration: 1.1,
         ease: 'power2.inOut',
         onUpdate: function() {
             element.textContent = '4→' + Math.floor(this.targets()[0].val);
@@ -122,7 +112,7 @@ function animateArrowCounter(element) {
 
 ScrollTrigger.create({
     trigger: '.stats',
-    start: 'top 70%',
+    start: 'top 80%',
     onEnter: () => {
         document.querySelectorAll('.stat-number[data-count]').forEach(stat => {
             const target = parseInt(stat.dataset.count);
@@ -138,7 +128,7 @@ ScrollTrigger.create({
 });
 
 // ========================================
-// Cursor Glow Effect (Desktop Only)
+// Cursor Glow (Desktop Only)
 // ========================================
 
 const cursorGlow = document.querySelector('.cursor-glow');
@@ -153,12 +143,10 @@ if (cursorGlow && window.matchMedia('(hover: hover)').matches && !prefersReduced
     });
 
     function animateGlow() {
-        glowX += (mouseX - glowX) * 0.1;
-        glowY += (mouseY - glowY) * 0.1;
-
+        glowX += (mouseX - glowX) * 0.08;
+        glowY += (mouseY - glowY) * 0.08;
         cursorGlow.style.left = glowX + 'px';
         cursorGlow.style.top = glowY + 'px';
-
         requestAnimationFrame(animateGlow);
     }
 
@@ -169,43 +157,21 @@ if (cursorGlow && window.matchMedia('(hover: hover)').matches && !prefersReduced
 }
 
 // ========================================
-// 3D Card Tilt Effect
+// Section Title Reveal
 // ========================================
 
-if (typeof VanillaTilt !== 'undefined' && window.matchMedia('(hover: hover)').matches && !prefersReducedMotion) {
-    VanillaTilt.init(document.querySelectorAll('.highlight-card, .scale-card, .skill-card, .education-card'), {
-        max: 8,
-        speed: 400,
-        glare: true,
-        'max-glare': 0.15,
-        scale: 1.02,
-        perspective: 1000,
-    });
-}
-
-// ========================================
-// Simple Fade-In on Scroll (Reliable)
-// ========================================
-
-// Only animate elements that enter viewport, no stagger issues
 if (!prefersReducedMotion) {
-    // Section titles with blur
     gsap.utils.toArray('.section-title').forEach(el => {
         gsap.fromTo(el,
-            {
-                opacity: 0,
-                filter: 'blur(10px)',
-                y: 30
-            },
+            { opacity: 0, y: 24 },
             {
                 opacity: 1,
-                filter: 'blur(0px)',
                 y: 0,
-                duration: 1,
+                duration: 0.8,
                 ease: 'power2.out',
                 scrollTrigger: {
                     trigger: el,
-                    start: 'top 85%',
+                    start: 'top 88%',
                     toggleActions: 'play none none none',
                     once: true
                 }
@@ -213,32 +179,27 @@ if (!prefersReducedMotion) {
         );
     });
 
-    // Cards with simple fade up (no stagger to avoid progressive fade issue)
+    // Cards fade up individually (no stagger to avoid progressive fade issues)
     const cardSelectors = [
         '.stat-card',
-        '.highlight-card',
-        '.scale-card',
+        '.case-study',
+        '.principle',
         '.education-card',
-        '.skill-card',
-        '.win-card',
         '.timeline-item'
     ];
 
     cardSelectors.forEach(selector => {
-        gsap.utils.toArray(selector).forEach((card, index) => {
+        gsap.utils.toArray(selector).forEach(card => {
             gsap.fromTo(card,
-                {
-                    opacity: 0,
-                    y: 40
-                },
+                { opacity: 0, y: 32 },
                 {
                     opacity: 1,
                     y: 0,
-                    duration: 0.8,
+                    duration: 0.7,
                     ease: 'power3.out',
                     scrollTrigger: {
                         trigger: card,
-                        start: 'top 90%',
+                        start: 'top 92%',
                         toggleActions: 'play none none none',
                         once: true
                     }
@@ -249,17 +210,17 @@ if (!prefersReducedMotion) {
 }
 
 // ========================================
-// Timeline Draw-On Animation
+// Timeline Line Draw-On
 // ========================================
 
 const timelineLine = document.querySelector('.timeline-line');
-if (timelineLine) {
+if (timelineLine && !prefersReducedMotion) {
     gsap.to('.timeline-line', {
         scaleY: 1,
         ease: 'none',
         scrollTrigger: {
             trigger: '.timeline',
-            start: 'top 60%',
+            start: 'top 65%',
             end: 'bottom 80%',
             scrub: 1
         }
@@ -267,31 +228,7 @@ if (timelineLine) {
 }
 
 // ========================================
-// Hero Floating Shapes Parallax
-// ========================================
-
-if (!prefersReducedMotion) {
-    const shapes = [
-        { selector: '.hero-shape-1', distance: -100, scrub: 1 },
-        { selector: '.hero-shape-2', distance: -150, scrub: 1.5 },
-        { selector: '.hero-shape-3', distance: -80, scrub: 0.8 }
-    ];
-
-    shapes.forEach(shape => {
-        gsap.to(shape.selector, {
-            y: shape.distance,
-            scrollTrigger: {
-                trigger: '.hero',
-                start: 'top top',
-                end: 'bottom top',
-                scrub: shape.scrub
-            }
-        });
-    });
-}
-
-// ========================================
-// Mobile Navigation Menu
+// Mobile Navigation
 // ========================================
 
 const navToggle = document.querySelector('.nav-toggle');
@@ -306,7 +243,6 @@ function toggleMobileNav() {
 
     const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
     navToggle.setAttribute('aria-expanded', !isExpanded);
-
     mobileNav.setAttribute('aria-hidden', isExpanded);
     mobileOverlay.setAttribute('aria-hidden', isExpanded);
 
@@ -323,7 +259,7 @@ if (mobileOverlay) {
 
 mobileLinks.forEach(link => {
     link.addEventListener('click', () => {
-        toggleMobileNav();
+        if (mobileNav.classList.contains('active')) toggleMobileNav();
     });
 });
 
@@ -344,9 +280,9 @@ window.addEventListener('scroll', () => {
 
         if (navLink) {
             if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                navLink.style.color = '#e8e8ed';
+                navLink.style.color = 'var(--color-text)';
             } else {
-                navLink.style.color = '#9898a8';
+                navLink.style.color = '';
             }
         }
     });
