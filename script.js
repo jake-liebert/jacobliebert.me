@@ -97,11 +97,11 @@ function animateArrowCounter(element) {
         duration: 0.7,
         ease: 'power2.out',
         onUpdate: function() {
-            element.textContent = Math.floor(this.targets()[0].val) + '→10';
+            element.textContent = Math.floor(this.targets()[0].val) + '→15';
         }
     })
     .to({ val: 4 }, {
-        val: 10,
+        val: 15,
         duration: 1.1,
         ease: 'power2.inOut',
         onUpdate: function() {
