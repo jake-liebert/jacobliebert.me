@@ -10,3 +10,6 @@ Thumbs.db
 
 # Resume source file (keep private)
 *.docx
+
+# Claude Code local files (worktrees, redesign screenshots, configs)
+.claude/

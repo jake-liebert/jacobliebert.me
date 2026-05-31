@@ -1,289 +1,176 @@
-// ========================================
-// jacobliebert.me — minimal animation layer
-// ========================================
+/* ============================================================
+   Jake Liebert — Executive Luxe
+   Minimal, near-still interaction layer. No frameworks, no CDN.
+   - Subtle fade-up reveals via IntersectionObserver
+   - Sticky masthead hairline on scroll
+   - Active-section nav highlighting
+   - Snappy tabular tick-up on the proof band (motion-gated)
+   Reduced-motion users get the final state instantly.
+   ============================================================ */
+(function () {
+  'use strict';
 
-document.documentElement.classList.remove('no-js');
+  var prefersReducedMotion =
+    window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-gsap.registerPlugin(ScrollTrigger);
+  /* ---------- Reveal on scroll ---------- */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function revealAll() {
+    revealEls.forEach(function (el) {
+      el.classList.add('is-in');
+    });
+  }
 
-// ========================================
-// Hero Entrance
-// ========================================
-
-if (!prefersReducedMotion) {
-    gsap.set('.hero-image, .hero-name, .hero-thesis, .hero-credentials, .hero-cta', {
-        opacity: 0,
-        y: 16
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    // Render everything at final state. Nothing stays hidden.
+    revealAll();
+  } else {
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+    );
+    revealEls.forEach(function (el) {
+      io.observe(el);
     });
 
-    const heroTl = gsap.timeline({ delay: 0.2 });
-    heroTl
-        .to('.hero-image',       { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' })
-        .to('.hero-name',        { opacity: 1, y: 0, duration: 0.7 }, '-=0.4')
-        .to('.hero-thesis',      { opacity: 1, y: 0, duration: 0.7 }, '-=0.4')
-        .to('.hero-credentials', { opacity: 1, y: 0, duration: 0.6 }, '-=0.4')
-        .to('.hero-cta',         { opacity: 1, y: 0, duration: 0.6 }, '-=0.4');
-}
-
-// ========================================
-// Smooth Scroll for Anchor Links
-// ========================================
-
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        if (href === '#') return;
-        const target = document.querySelector(href);
-        if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    // Failsafe: if anything is still hidden shortly after load, show it.
+    window.addEventListener('load', function () {
+      window.setTimeout(function () {
+        revealEls.forEach(function (el) {
+          var r = el.getBoundingClientRect();
+          if (r.top < window.innerHeight && !el.classList.contains('is-in')) {
+            el.classList.add('is-in');
+          }
+        });
+      }, 600);
     });
-});
+  }
 
-// ========================================
-// Navbar Background on Scroll
-// ========================================
+  /* ---------- Proof-band tick-up (tabular, easeOutExpo) ----------
+     HTML already contains the final literal values, so under reduced
+     motion or without IntersectionObserver we leave them untouched. */
+  function animateCount(el) {
+    var target = parseFloat(el.getAttribute('data-count'));
+    var prefix = el.getAttribute('data-prefix') || '';
+    var suffix = el.getAttribute('data-suffix') || '';
+    var dur = 900;
+    var start = null;
 
-const navbar = document.querySelector('.navbar');
-
-window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-    if (currentScroll > 60) {
-        navbar.style.background = 'rgba(10, 22, 40, 0.95)';
-        navbar.style.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.35)';
-    } else {
-        navbar.style.background = 'rgba(10, 22, 40, 0.85)';
-        navbar.style.boxShadow = 'none';
+    function frame(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      // easeOutExpo — snappy, mechanical settle
+      var eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      var val = Math.round(target * eased);
+      el.textContent = prefix + val + suffix;
+      if (p < 1) requestAnimationFrame(frame);
+      else el.textContent = prefix + target + suffix;
     }
-});
+    requestAnimationFrame(frame);
+  }
 
-// ========================================
-// Scroll Progress Bar
-// ========================================
+  function animatePair(el) {
+    // "4 → 15" — tick the second number up; keep the arrow markup.
+    var pair = el.getAttribute('data-pair').split('|');
+    var from = parseInt(pair[0], 10);
+    var to = parseInt(pair[1], 10);
+    var dur = 900;
+    var start = null;
 
-gsap.to('.scroll-progress', {
-    width: '100%',
-    ease: 'none',
-    scrollTrigger: {
-        trigger: document.body,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.3
+    function render(second) {
+      el.innerHTML =
+        from +
+        ' <span class="arrow" aria-hidden="true">→</span> ' +
+        second;
     }
-});
 
-// ========================================
-// Stat Counters
-// ========================================
+    function frame(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      render(Math.round(from + (to - from) * eased));
+      if (p < 1) requestAnimationFrame(frame);
+      else render(to);
+    }
+    requestAnimationFrame(frame);
+  }
 
-function animateCounter(element, target, prefix = '', suffix = '') {
-    gsap.to({ val: 0 }, {
-        val: target,
-        duration: 1.8,
-        ease: 'power2.out',
-        onUpdate: function() {
-            element.textContent = prefix + Math.floor(this.targets()[0].val) + suffix;
-        }
+  var statEls = Array.prototype.slice.call(
+    document.querySelectorAll('.proof-num')
+  );
+
+  if (!prefersReducedMotion && 'IntersectionObserver' in window && statEls.length) {
+    var countObserver = new IntersectionObserver(
+      function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var el = entry.target;
+          if (el.hasAttribute('data-count')) animateCount(el);
+          else if (el.hasAttribute('data-pair')) animatePair(el);
+          obs.unobserve(el);
+        });
+      },
+      { threshold: 0.5 }
+    );
+    statEls.forEach(function (el) {
+      countObserver.observe(el);
     });
-}
+  }
+  // Reduced motion / no IO: literal HTML final values remain. Nothing to do.
 
-function animateArrowCounter(element) {
-    const tl = gsap.timeline();
-    tl.to({ val: 0 }, {
-        val: 4,
-        duration: 0.7,
-        ease: 'power2.out',
-        onUpdate: function() {
-            element.textContent = Math.floor(this.targets()[0].val) + '→15';
-        }
+  /* ---------- Sticky masthead hairline ---------- */
+  var masthead = document.querySelector('.masthead');
+  if (masthead) {
+    var onScroll = function () {
+      if (window.scrollY > 12) {
+        masthead.classList.add('is-scrolled');
+      } else {
+        masthead.classList.remove('is-scrolled');
+      }
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  /* ---------- Active section nav highlighting ---------- */
+  var navLinks = Array.prototype.slice.call(
+    document.querySelectorAll('.masthead-nav a')
+  );
+  var sections = navLinks
+    .map(function (link) {
+      var id = link.getAttribute('href');
+      return id && id.charAt(0) === '#' ? document.querySelector(id) : null;
     })
-    .to({ val: 4 }, {
-        val: 15,
-        duration: 1.1,
-        ease: 'power2.inOut',
-        onUpdate: function() {
-            element.textContent = '4→' + Math.floor(this.targets()[0].val);
-        }
-    });
-}
+    .filter(Boolean);
 
-ScrollTrigger.create({
-    trigger: '.stats',
-    start: 'top 80%',
-    onEnter: () => {
-        document.querySelectorAll('.stat-number[data-count]').forEach(stat => {
-            const target = parseInt(stat.dataset.count);
-            const prefix = stat.dataset.prefix || '';
-            const suffix = stat.dataset.suffix || '';
-            animateCounter(stat, target, prefix, suffix);
+  if (sections.length && 'IntersectionObserver' in window) {
+    var navObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            var id = '#' + entry.target.id;
+            navLinks.forEach(function (link) {
+              link.classList.toggle(
+                'is-active',
+                link.getAttribute('href') === id
+              );
+            });
+          }
         });
-
-        const specialStat = document.querySelector('[data-count-special]');
-        if (specialStat) animateArrowCounter(specialStat);
-    },
-    once: true
-});
-
-// ========================================
-// Cursor Glow (Desktop Only)
-// ========================================
-
-const cursorGlow = document.querySelector('.cursor-glow');
-
-if (cursorGlow && window.matchMedia('(hover: hover)').matches && !prefersReducedMotion) {
-    let mouseX = 0, mouseY = 0;
-    let glowX = 0, glowY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+      },
+      { rootMargin: '-45% 0px -50% 0px' }
+    );
+    sections.forEach(function (section) {
+      navObserver.observe(section);
     });
-
-    function animateGlow() {
-        glowX += (mouseX - glowX) * 0.08;
-        glowY += (mouseY - glowY) * 0.08;
-        cursorGlow.style.left = glowX + 'px';
-        cursorGlow.style.top = glowY + 'px';
-        requestAnimationFrame(animateGlow);
-    }
-
-    animateGlow();
-
-    document.addEventListener('mouseenter', () => cursorGlow.classList.add('active'));
-    document.addEventListener('mouseleave', () => cursorGlow.classList.remove('active'));
-}
-
-// ========================================
-// Section Title Reveal
-// ========================================
-
-if (!prefersReducedMotion) {
-    gsap.utils.toArray('.section-title').forEach(el => {
-        gsap.fromTo(el,
-            { opacity: 0, y: 24 },
-            {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: 'power2.out',
-                scrollTrigger: {
-                    trigger: el,
-                    start: 'top 88%',
-                    toggleActions: 'play none none none',
-                    once: true
-                }
-            }
-        );
-    });
-
-    // Cards fade up individually (no stagger to avoid progressive fade issues)
-    const cardSelectors = [
-        '.stat-card',
-        '.case-study',
-        '.principle',
-        '.education-card',
-        '.timeline-item'
-    ];
-
-    cardSelectors.forEach(selector => {
-        gsap.utils.toArray(selector).forEach(card => {
-            gsap.fromTo(card,
-                { opacity: 0, y: 32 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.7,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: card,
-                        start: 'top 92%',
-                        toggleActions: 'play none none none',
-                        once: true
-                    }
-                }
-            );
-        });
-    });
-}
-
-// ========================================
-// Timeline Line Draw-On
-// ========================================
-
-const timelineLine = document.querySelector('.timeline-line');
-if (timelineLine && !prefersReducedMotion) {
-    gsap.to('.timeline-line', {
-        scaleY: 1,
-        ease: 'none',
-        scrollTrigger: {
-            trigger: '.timeline',
-            start: 'top 65%',
-            end: 'bottom 80%',
-            scrub: 1
-        }
-    });
-}
-
-// ========================================
-// Mobile Navigation
-// ========================================
-
-const navToggle = document.querySelector('.nav-toggle');
-const mobileNav = document.querySelector('.mobile-nav');
-const mobileOverlay = document.querySelector('.mobile-nav-overlay');
-const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
-
-function toggleMobileNav() {
-    navToggle.classList.toggle('active');
-    mobileNav.classList.toggle('active');
-    mobileOverlay.classList.toggle('active');
-
-    const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
-    navToggle.setAttribute('aria-expanded', !isExpanded);
-    mobileNav.setAttribute('aria-hidden', isExpanded);
-    mobileOverlay.setAttribute('aria-hidden', isExpanded);
-
-    document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
-}
-
-if (navToggle) {
-    navToggle.addEventListener('click', toggleMobileNav);
-}
-
-if (mobileOverlay) {
-    mobileOverlay.addEventListener('click', toggleMobileNav);
-}
-
-mobileLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        if (mobileNav.classList.contains('active')) toggleMobileNav();
-    });
-});
-
-// ========================================
-// Active Nav Link Highlighting
-// ========================================
-
-const sections = document.querySelectorAll('section[id]');
-
-window.addEventListener('scroll', () => {
-    const scrollY = window.pageYOffset;
-
-    sections.forEach(section => {
-        const sectionHeight = section.offsetHeight;
-        const sectionTop = section.offsetTop - 150;
-        const sectionId = section.getAttribute('id');
-        const navLink = document.querySelector(`.nav-links a[href="#${sectionId}"]`);
-
-        if (navLink) {
-            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                navLink.style.color = 'var(--color-text)';
-            } else {
-                navLink.style.color = '';
-            }
-        }
-    });
-});
+  }
+})();
